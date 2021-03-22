@@ -8,6 +8,7 @@
 const bcrypt = require("bcrypt");
 const toJSON = require("to-json");
 const jwt = require("jsonwebtoken");
+const path = require("path");
 
 module.exports = {
   login: async function (req, res) {
@@ -78,8 +79,8 @@ module.exports = {
     }
 
     data = {
-      username: req.body.username,
-      email: req.body.email,
+      username: req.body.username.toLowerCase(),
+      email: req.body.email.toLowerCase(),
       password: req.body.password,
       phoneNo: req.body.phone_no,
     };
@@ -148,15 +149,10 @@ module.exports = {
   // upload profile image
   uploadFile: async function (req, res) {
     const id = req.user.id;
-    const user = await User.find({
-      where: { id: id },
-    });
-
-    const directory = "C:Users/Lenovo/Desktop/office/userapi/assets/images/";
     await req.file("file").upload(
       {
         // Directory path where you want to save...
-        dirname: directory,
+        dirname: sails.config.appPath + "/assets/images/",
       },
       function (err, file) {
         if (err) console.log(err);
@@ -167,7 +163,7 @@ module.exports = {
     await User.update(
       { id: id },
       {
-        profileImage: directory,
+        profileImage: sails.config.appPath + "/assets/images/",
       }
     );
   },
