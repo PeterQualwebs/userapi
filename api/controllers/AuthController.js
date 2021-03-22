@@ -99,6 +99,10 @@ module.exports = {
   details: async function (req, res) {
     const email = req.user.email;
 
+    if (!email) {
+      return res.json({ message: "No user found" });
+    }
+
     const user = await User.find({
       where: { email: email },
     });
