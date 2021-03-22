@@ -153,6 +153,7 @@ module.exports = {
       {
         // Directory path where you want to save...
         dirname: sails.config.appPath + "/assets/images/",
+        saveAs: req.user.username + "avatar.png",
       },
       function (err, file) {
         if (err) console.log(err);
@@ -163,7 +164,11 @@ module.exports = {
     await User.update(
       { id: id },
       {
-        profileImage: sails.config.appPath + "/assets/images/",
+        profileImage:
+          sails.config.appPath +
+          "/assets/images/" +
+          req.user.username +
+          "avatar.png",
       }
     );
   },
