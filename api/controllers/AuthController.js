@@ -153,22 +153,25 @@ module.exports = {
       {
         // Directory path where you want to save...
         dirname: sails.config.appPath + "/assets/images/",
-        saveAs: req.user.username + "avatar.png",
+        saveAs: function (file, cb) {
+          cb(null, req.user.username + "avatar" + path.extname(file.filename));
+        },
       },
-      function (err, file) {
+      async function (err, file) {
         if (err) console.log(err);
         res.json({ status: "file upload successfully", file: file });
-      }
-    );
 
-    await User.update(
-      { id: id },
-      {
-        profileImage:
-          sails.config.appPath +
-          "/assets/images/" +
-          req.user.username +
-          "avatar.png",
+        await User.update(
+          { id: id },
+          {
+            profileImage:
+              sails.config.appPath +
+              "/assets/images/" +
+              req.user.username +
+              "avatar" +
+              path.extname(file[0].filename),
+          }
+        );
       }
     );
   },
