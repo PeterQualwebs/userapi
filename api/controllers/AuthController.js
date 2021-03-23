@@ -8,7 +8,8 @@
 const bcrypt = require("bcrypt");
 const toJSON = require("to-json");
 const jwt = require("jsonwebtoken");
-const path = require("path");
+
+const { setMaxListeners } = require("process");
 
 module.exports = {
   login: async function (req, res) {
@@ -148,32 +149,12 @@ module.exports = {
 
   // upload profile image
   uploadFile: async function (req, res) {
-    const id = req.user.id;
-    await req.file("file").upload(
-      {
-        // Directory path where you want to save...
-        dirname: sails.config.appPath + "/assets/images/",
-        saveAs: function (file, cb) {
-          cb(null, req.user.username + "avatar" + path.extname(file.filename));
-        },
-      },
-      async function (err, file) {
-        if (err) console.log(err);
-        res.json({ status: "file upload successfully", file: file });
-
-        await User.update(
-          { id: id },
-          {
-            profileImage:
-              sails.config.appPath +
-              "/assets/images/" +
-              req.user.username +
-              "avatar" +
-              path.extname(file[0].filename),
-          }
-        );
-      }
-    );
+    const file = await sails.helpers.fileUpload(req, res);
+    if (!file) {
+      res.badRequest({ message: "file not uploaded" });
+    } else {
+      res.json({ status: "file upload successfully", file });
+    }
   },
 
   // logout user
